@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="bn">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>𝗙𝗶𝗹𝗘 𝗣𝗟𝗔𝗬 𝗕𝗢𝗧- Premium Edition</title>
+    <title></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -18,120 +19,350 @@
         }
 
         body {
-            margin: 0; padding: 0;
+            margin: 0;
+            padding: 0;
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: radial-gradient(circle at top right, #0a192f, #030a1c);
             color: var(--text-main);
-            display: flex; justify-content: center; align-items: center;
-            min-height: 100vh; overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
             padding: 85px 0 40px;
         }
 
         /* --- Navigation --- */
         nav {
-            position: fixed; top: 0; left: 0; width: 100%; height: 70px;
-            background: rgba(3, 10, 28, 0.95); backdrop-filter: blur(15px);
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 20px; box-sizing: border-box; z-index: 1000;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background: rgba(3, 10, 28, 0.95);
+            backdrop-filter: blur(15px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            box-sizing: border-box;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
-        .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-        .nav-logo img { 
-            width: 32px; height: 32px; border-radius: 8px; 
-            box-shadow: 0 0 10px var(--accent-glow); 
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
         }
-        .nav-logo span { 
-            font-size: 20px; font-weight: 800; color: var(--text-main); 
+
+        .nav-logo img {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .nav-logo span {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-main);
             text-transform: lowercase;
         }
-        .menu-icon { font-size: 24px; cursor: pointer; color: var(--text-main); }
+
+        .menu-icon {
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-main);
+        }
 
         /* Sidebar & Overlay */
         .sidebar {
-            position: fixed; top: 0; right: -100%; width: 280px; height: 100%;
-            background: #0a192f; z-index: 2000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-            padding: 60px 20px; box-shadow: -10px 0 40px rgba(0,0,0,0.8);
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 280px;
+            height: 100%;
+            background: #0a192f;
+            z-index: 2000;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 60px 20px;
+            box-shadow: -10px 0 40px rgba(0, 0, 0, 0.8);
         }
-        .sidebar.active { right: 0; }
-        .close-btn { position: absolute; top: 20px; right: 20px; font-size: 26px; cursor: pointer; }
-        .sidebar-links { list-style: none; padding: 0; margin-top: 40px; }
+
+        .sidebar.active {
+            right: 0;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 26px;
+            cursor: pointer;
+        }
+
+        .sidebar-links {
+            list-style: none;
+            padding: 0;
+            margin-top: 40px;
+        }
+
         .sidebar-links a {
-            color: #ffffff; text-decoration: none; font-size: 18px;
-            display: flex; align-items: center; gap: 15px; padding: 15px;
-            border-radius: 12px; background: rgba(0, 132, 255, 0.1);
-            border: 1px solid rgba(0, 132, 255, 0.2); transition: 0.3s;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-radius: 12px;
+            background: rgba(0, 132, 255, 0.1);
+            border: 1px solid rgba(0, 132, 255, 0.2);
+            transition: 0.3s;
         }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; z-index: 1500; }
-        .overlay.active { display: block; }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            z-index: 1500;
+        }
+
+        .overlay.active {
+            display: block;
+        }
 
         /* --- Main UI Container --- */
-        .container { width: 92%; max-width: 440px; }
-        .header { text-align: center; margin-bottom: 30px; }
-        .header h1 { font-size: 28px; font-weight: 800; margin-top: 10px; }
-
-        .glass-card {
-            background: var(--card-bg); backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 30px;
-            padding: 30px; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+        .container {
+            width: 92%;
+            max-width: 440px;
         }
 
-        .input-wrapper { position: relative; margin-bottom: 25px; }
-        .input-wrapper i { position: absolute; left: 15px; bottom: 16px; color: var(--accent); }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-top: 10px;
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .input-wrapper {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 15px;
+            bottom: 16px;
+            color: var(--accent);
+        }
+
         input[type="text"] {
-            width: 100%; padding: 16px 15px 16px 45px; background: var(--input-bg);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px;
-            color: white; font-size: 15px; outline: none; box-sizing: border-box;
+            width: 100%;
+            padding: 16px 15px 16px 45px;
+            background: var(--input-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            color: white;
+            font-size: 15px;
+            outline: none;
+            box-sizing: border-box;
         }
 
         /* How to Use Box */
         .how-to {
-            background: rgba(255, 255, 255, 0.03); border-radius: 20px;
-            padding: 18px; margin-bottom: 25px; border: 1px solid rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
         }
-        .how-to h3 { font-size: 14px; margin: 0 0 12px 0; color: #fff; display: flex; align-items: center; gap: 8px; }
-        .how-to li { font-size: 13px; color: var(--text-dim); margin-bottom: 8px; list-style: none; }
-        .how-to li span { color: var(--accent); font-weight: bold; margin-right: 8px; }
+
+        .how-to h3 {
+            font-size: 14px;
+            margin: 0 0 12px 0;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .how-to li {
+            font-size: 13px;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+            list-style: none;
+        }
+
+        .how-to li span {
+            color: var(--accent);
+            font-weight: bold;
+            margin-right: 8px;
+        }
 
         #dlBtn {
-            width: 100%; padding: 18px; background: linear-gradient(90deg, #007cf0, #00dfd8);
-            color: white; border: none; border-radius: 16px; font-size: 16px; font-weight: 700;
-            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px;
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(90deg, #007cf0, #00dfd8);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
         }
 
         /* Footer Stats */
-        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 30px; }
-        .stat-card {
-            background: rgba(255, 255, 255, 0.02); padding: 12px 5px; border-radius: 15px;
-            text-align: center; font-size: 10px; color: var(--text-dim); border: 1px solid rgba(255, 255, 255, 0.03);
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 30px;
         }
-        .stat-card i { display: block; font-size: 18px; color: var(--accent); margin-bottom: 6px; }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 12px 5px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 10px;
+            color: var(--text-dim);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .stat-card i {
+            display: block;
+            font-size: 18px;
+            color: var(--accent);
+            margin-bottom: 6px;
+        }
 
         /* Telegram Button */
-        .tg-footer { margin-top: 35px; text-align: center; }
-        .tg-btn {
-            display: inline-flex; align-items: center; gap: 12px;
-            background: var(--tg-color); color: white; padding: 15px 30px;
-            border-radius: 50px; text-decoration: none; font-weight: 700;
-            box-shadow: 0 10px 25px rgba(0, 136, 204, 0.4); transition: 0.3s;
+        .tg-footer {
+            margin-top: 35px;
+            text-align: center;
         }
-        .tg-btn:hover { transform: translateY(-3px); background: #0099e6; }
 
-        #results { margin-top: 20px; display: none; }
-        .media-btn {
-            background: rgba(255,255,255,0.05); border: 1px solid var(--accent); color: white;
-            width: 100%; padding: 14px; margin-top: 10px; border-radius: 12px; text-decoration: none;
-            display: flex; justify-content: space-between;
+        .tg-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--tg-color);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            box-shadow: 0 10px 25px rgba(0, 136, 204, 0.4);
+            transition: 0.3s;
         }
-        .spinner { width: 22px; height: 22px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite; display: none; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .tg-btn:hover {
+            transform: translateY(-3px);
+            background: #0099e6;
+        }
+
+        /* --- Tutorial Images Section --- */
+        .tutorial-section {
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .tutorial-box {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+
+        .tutorial-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0 0 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 4px solid var(--accent);
+            padding-left: 10px;
+        }
+
+        .tutorial-img {
+            width: 100%;
+            height: auto;
+            border-radius: 14px;
+            display: block;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        #results {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .media-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--accent);
+            color: white;
+            width: 100%;
+            padding: 14px;
+            margin-top: 10px;
+            border-radius: 12px;
+            text-decoration: none;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .spinner {
+            width: 22px;
+            height: 22px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
+
 <body>
 
     <nav>
         <a href="#" class="nav-logo">
-            <img src="https://i.postimg.cc/Y90xGXTH/IMG-20260515-162829-055.jpg" alt="fileplaybot logo"> 
-            <span>𝗙𝗶𝗹𝗘 𝗣𝗟𝗔𝗬 𝗕𝗢𝗧</span>
+            <img src="https://i.postimg.cc/Y90xGXTH/IMG-20260515-162829-055.jpg" alt="fileplaybot logo">
+            <span>𝗙𝗶𝗟𝗘 𝗣𝗟𝗔𝗬 𝗕𝗢𝗧 ❤️‍🩹</span>
         </a>
         <div class="menu-icon" id="openMenu"><i class="fas fa-bars"></i></div>
     </nav>
@@ -181,9 +412,31 @@
 
         <div class="tg-footer">
             <a href="https://t.me/editfactify" target="_blank" class="tg-btn">
-                <i class="fab fa-telegram-plane"></i> জয়েন টেলিগ্রাম
+                <i class="fab fa-telegram-plane"></i> Join Telegram Click here
             </a>
         </div>
+
+        <div class="tutorial-section">
+
+            <div class="tutorial-box">
+                <h2 class="tutorial-title"><i class="fas fa-book-open"></i> টিউটোরিয়াল বাংলা</h2>
+                <img src="https://i.postimg.cc/1tYSLxF7/file-00000000aaec71fab7992c03ed5cddbb.png" alt="Bangla Tutorial" class="tutorial-img">
+            </div>
+
+            <div class="tutorial-box">
+                <h2 class="tutorial-title"><i class="fas fa-book-open"></i> Tutorial English</h2>
+                <img src="https://i.postimg.cc/nzwx68mW/file-00000000f0cc71faaedbce3677f4ece1.png" alt="English Tutorial" class="tutorial-img">
+            </div>
+
+            <div class="tutorial-box">
+                <h2 class="tutorial-title"><i class="fas fa-book-open"></i> ट्यूटोरियल हिंद</h2>
+                <img src="https://i.postimg.cc/mgG4xyPn/file-000000004b087207a5022032f1145220.png" alt="Hindi Tutorial" class="tutorial-img">
+            </div>
+
+        </div>
+        <p style="text-align: center; font-size: 11px; color: var(--text-dim); margin-top: 35px; opacity: 0.5;">
+            © 2026 • Premium Experience
+        </p>
     </div>
 
     <script>
@@ -206,7 +459,7 @@
 
         dlBtn.onclick = async () => {
             const url = urlInput.value.trim();
-            if(!url) return alert("Please paste a link!");
+            if (!url) return alert("Please paste a link!");
 
             document.getElementById('loader').style.display = 'block';
             document.getElementById('btnIcon').style.display = 'none';
@@ -220,18 +473,21 @@
                         'x-rapidapi-host': 'social-download-all-in-one.p.rapidapi.com',
                         'x-rapidapi-key': 'f751ba2e32mshc5552fddf7efc07p137ddejsnc1cbf3774901'
                     },
-                    body: JSON.stringify({ url: url })
+                    body: JSON.stringify({
+                        url: url
+                    })
                 });
                 const data = await response.json();
                 results.innerHTML = '';
                 results.style.display = 'block';
-                if(data.medias) {
+                if (data.medias) {
                     data.medias.forEach(m => {
                         results.innerHTML += `<a href="${m.url}" target="_blank" class="media-btn"><span>${m.quality}</span><i class="fas fa-download"></i></a>`;
                     });
                 }
-            } catch (e) { alert("Error!"); }
-            finally {
+            } catch (e) {
+                alert("Error!");
+            } finally {
                 document.getElementById('loader').style.display = 'none';
                 document.getElementById('btnIcon').style.display = 'block';
                 dlBtn.disabled = false;
@@ -239,4 +495,5 @@
         };
     </script>
 </body>
+
 </html>
