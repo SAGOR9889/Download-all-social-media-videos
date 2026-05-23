@@ -553,4 +553,220 @@
             if (adsEnabled) {
                 if (!document.getElementById('monetagScript')) {
                     const script = document.createElement('script');
-                    script.id = 'monetagScript
+                    script.id = 'monetagScript';
+                    script.text = `(function(s){s.dataset.zone='11042175',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).filter(Boolean).pop().appendChild(document.createElement('script')))`;
+                    document.head.appendChild(script);
+                }
+            } else {
+                const existingScript = document.getElementById('monetagScript');
+                if (existingScript) existingScript.remove();
+            }
+        });
+
+        let allPromptsList = [];
+        let filteredList = [];
+        let currentPage = 1;
+        const itemsPerPage = 10; 
+        let isSearching = false;
+        let activePromptText = "";
+        let activePromptId = "";
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.setAttribute('data-theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+            }
+        }
+
+        database.ref('prompts').once('value').then(function(snapshot) {
+            allPromptsList = [];
+            let count = 0;
+            snapshot.forEach(childSnapshot => {
+                allPromptsList.push({id: childSnapshot.key, ...childSnapshot.val()});
+                count++;
+            });
+            
+            allPromptsList.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            document.getElementById('totalPrompts').innerText = count;
+            
+            filteredList = [...allPromptsList];
+            displayCards();
+            setupPagination();
+
+            checkDeepLink();
+            
+        }).catch(function(error) {
+            console.error("Data load failed: ", error);
+        });
+
+        function displayCards() {
+            const container = document.getElementById('galleryContainer');
+            container.innerHTML = "";
+
+            let start = (currentPage - 1) * itemsPerPage;
+            let end = start + itemsPerPage;
+            let itemsToDisplay = isSearching ? filteredList : filteredList.slice(start, end);
+
+            itemsToDisplay.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="image-container">
+                        <img src="${item.image}" alt="">
+                    </div>
+                    <div class="card-info">
+                        <div class="card-title">${item.title}</div>
+                        <div class="card-actions">
+                            <button class="view-prompt-btn" onclick="openPrompt('${item.id}')">
+                                <i class="fa-regular fa-eye"></i> View Prompt
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function setupPagination() {
+            const pgContainer = document.getElementById('paginationContainer');
+            pgContainer.innerHTML = "";
+            if(isSearching) return;
+
+            const totalPages = Math.ceil(filteredList.length / itemsPerPage);
+            if(totalPages <= 1) return;
+
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'page-btn';
+            prevBtn.innerHTML = '<i class="fa-solid fa-chevron-left"></i>';
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.onclick = function() {
+                if(currentPage > 1) {
+                    currentPage--;
+                    displayCards();
+                    setupPagination();
+                }
+            };
+            pgContainer.appendChild(prevBtn);
+
+            let maxVisibleButtons = 5; 
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisibleButtons / 2));
+            let endPage = startPage + maxVisibleButtons - 1;
+
+            if (endPage > totalPages) {
+                endPage = totalPages;
+                startPage = Math.max(1, endPage - maxVisibleButtons + 1);
+            }
+
+            for(let i = startPage; i <= endPage; i++) {
+                const btn = document.createElement('button');
+                btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                btn.innerText = i;
+                btn.onclick = function() {
+                    currentPage = i;
+                    displayCards();
+                    setupPagination();
+                    window.scrollTo({top: 0, behavior: 'smooth'});
+                };
+                pgContainer.appendChild(btn);
+            }
+
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'page-btn';
+            nextBtn.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.onclick = function() {
+                if(currentPage < totalPages) {
+                    currentPage++;
+                    displayCards();
+                    setupPagination();
+                }
+            };
+            pgContainer.appendChild(nextBtn);
+        }
+
+        function handleSearch() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            if(query === "") {
+                isSearching = false;
+                filteredList = [...allPromptsList];
+            } else {
+                isSearching = true;
+                filteredList = allPromptsList.filter(item => item.title.toLowerCase().includes(query));
+            }
+            currentPage = 1;
+            displayCards();
+            setupPagination();
+        }
+
+        function openPrompt(id) {
+            const item = allPromptsList.find(p => p.id === id);
+            if(!item) return;
+            document.getElementById('modalTitle').innerText = item.title;
+            document.getElementById('modalImg').src = item.image;
+            document.getElementById('modalPromptText').innerText = item.prompt;
+            activePromptText = item.prompt;
+            activePromptId = id;
+            document.getElementById('promptModal').style.display = 'flex';
+            
+            window.location.hash = `prompt-${id}`;
+        }
+
+        function closePrompt() {
+            document.getElementById('promptModal').style.display = 'none';
+            history.replaceState(null, null, ' '); 
+            activePromptId = "";
+        }
+
+        function checkDeepLink() {
+            const hash = window.location.hash;
+            if (hash && hash.startsWith('#prompt-')) {
+                const id = hash.replace('#prompt-', '');
+                const targetIndex = allPromptsList.findIndex(p => p.id === id);
+                if (targetIndex !== -1) {
+                    currentPage = Math.floor(targetIndex / itemsPerPage) + 1;
+                    displayCards();
+                    setupPagination();
+                    openPrompt(id);
+                }
+            }
+        }
+
+        function copyDeepLink() {
+            if(!activePromptId) return;
+            const deepLinkUrl = window.location.origin + window.location.pathname + `#prompt-${activePromptId}`;
+            executeCopy(deepLinkUrl, "Link Disalin");
+        }
+
+        function copyFromModal() {
+            if(!activePromptText) return;
+            executeCopy(activePromptText, "Disalin");
+        }
+
+        function executeCopy(text, toastMsg = "Disalin") {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                const toast = document.getElementById('toastNotif');
+                toast.innerText = toastMsg;
+                toast.style.display = 'block';
+                setTimeout(() => { toast.style.display = 'none'; }, 1500);
+            } catch (err) {
+                alert('কপি করা যায়নি!');
+            }
+            document.body.removeChild(textarea);
+        }
+
+        window.onclick = function(e) {
+            if (e.target == document.getElementById('promptModal')) { closePrompt(); }
+        }
+
+        window.addEventListener('hashchange', checkDeepLink);
+    </script>
+</body>
+</html>
