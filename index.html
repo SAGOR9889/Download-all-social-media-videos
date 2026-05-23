@@ -1,499 +1,556 @@
 <!DOCTYPE html>
-<html lang="bn">
-
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <meta name="google-site-verification" content="tkhffQ2yi6C8WbWOwSzlQI2rrL5KHR58J4AZcwnkxM8" />
+    
+    <meta name="monetag" content="d93387477b25bd71cdbf3a4f7002b778">
+    
+    <title>promtfy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css?v=2.0">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
     <style>
         :root {
-            --bg-color: #030a1c;
-            --accent: #0084ff;
-            --accent-glow: rgba(0, 132, 255, 0.5);
-            --card-bg: rgba(13, 25, 48, 0.7);
-            --input-bg: rgba(2, 12, 27, 0.8);
-            --text-main: #ffffff;
-            --text-dim: #94a3b8;
-            --tg-color: #0088cc;
+            --bg-color: #0d0d0d;
+            --card-bg: #141414;
+            --card-border: #1e1e1e;
+            --text-color: #ffffff;
+            --subtitle-color: #7a7a7a;
+            --search-bg: #141414;
+            --search-border: #1e1e1e;
+            --btn-view-bg: #1c2012;
+            --btn-view-border: #2d3319;
+            --btn-view-text: #ccff00;
+            --btn-copy-bg: #ccff00;
+            --btn-copy-text: #000000;
+            --btn-tg-bg: #0088cc;
+            --btn-tg-text: #ffffff;
+            --social-bg: #141414;
+            --social-border: #1e1e1e;
+            --social-text: #ffffff;
+            --modal-prompt-bg: #080808;
+            --modal-prompt-text: #a0a0a0;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f7f8fa;
+            --card-bg: #ffffff;
+            --card-border: #e2e8f0;
+            --text-color: #1a202c;
+            --subtitle-color: #718096;
+            --search-bg: #ffffff;
+            --search-border: #e2e8f0;
+            --btn-view-bg: #edf2f7;
+            --btn-view-border: #cbd5e0;
+            --btn-view-text: #4a5568;
+            --btn-copy-bg: #1a202c;
+            --btn-copy-text: #ffffff;
+            --btn-tg-bg: #0088cc;
+            --btn-tg-text: #ffffff;
+            --social-bg: #edf2f7;
+            --social-border: #cbd5e0;
+            --social-text: #1a202c;
+            --modal-prompt-bg: #f7f8fa;
+            --modal-prompt-text: #4a5568;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: radial-gradient(circle at top right, #0a192f, #030a1c);
-            color: var(--text-main);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 16px 8px 30px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: background-color 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        header {
+            position: relative;
+            text-align: center;
+            margin-bottom: 16px;
+            width: 100%;
+            max-width: 450px;
+            padding: 0 4px;
+        }
+
+        .theme-toggle-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+        }
+
+        header h1 {
+            font-size: 2.1rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-top: 5px;
+            margin-bottom: 6px;
+        }
+
+        header .subtitle {
+            color: var(--subtitle-color);
+            font-size: 0.78rem;
+            margin-bottom: 14px;
+        }
+
+        .social-links {
             display: flex;
             justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
-            padding: 85px 0 40px;
-        }
-
-        /* --- Navigation --- */
-        nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 70px;
-            background: rgba(3, 10, 28, 0.95);
-            backdrop-filter: blur(15px);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            box-sizing: border-box;
-            z-index: 1000;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .nav-logo {
-            display: flex;
-            align-items: center;
             gap: 10px;
+            margin-bottom: 18px;
+            width: 100%;
+        }
+
+        .social-btn {
+            background-color: var(--social-bg);
+            color: var(--social-text);
+            border: 1px solid var(--social-border);
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.8rem;
             text-decoration: none;
-        }
-
-        .nav-logo img {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px var(--accent-glow);
-        }
-
-        .nav-logo span {
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--text-main);
-            text-transform: lowercase;
-        }
-
-        .menu-icon {
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--text-main);
-        }
-
-        /* Sidebar & Overlay */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            right: -100%;
-            width: 280px;
-            height: 100%;
-            background: #0a192f;
-            z-index: 2000;
-            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 60px 20px;
-            box-shadow: -10px 0 40px rgba(0, 0, 0, 0.8);
-        }
-
-        .sidebar.active {
-            right: 0;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 26px;
-            cursor: pointer;
-        }
-
-        .sidebar-links {
-            list-style: none;
-            padding: 0;
-            margin-top: 40px;
-        }
-
-        .sidebar-links a {
-            color: #ffffff;
-            text-decoration: none;
-            font-size: 18px;
             display: flex;
             align-items: center;
-            gap: 15px;
-            padding: 15px;
-            border-radius: 12px;
-            background: rgba(0, 132, 255, 0.1);
-            border: 1px solid rgba(0, 132, 255, 0.2);
-            transition: 0.3s;
+            justify-content: space-between;
+            font-weight: 600;
+            flex: 1;
+            max-width: 210px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: transform 0.1s ease, background-color 0.2s ease;
         }
 
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            display: none;
-            z-index: 1500;
+        .social-btn:active {
+            transform: scale(0.97);
+            background-color: rgba(255, 255, 255, 0.05);
         }
 
-        .overlay.active {
-            display: block;
-        }
-
-        /* --- Main UI Container --- */
-        .container {
-            width: 92%;
-            max-width: 440px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 28px;
-            font-weight: 800;
-            margin-top: 10px;
-        }
-
-        .glass-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 30px;
-            padding: 30px;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
-        }
-
-        .input-wrapper {
-            position: relative;
-            margin-bottom: 25px;
-        }
-
-        .input-wrapper i {
-            position: absolute;
-            left: 15px;
-            bottom: 16px;
-            color: var(--accent);
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 16px 15px 16px 45px;
-            background: var(--input-bg);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            color: white;
-            font-size: 15px;
-            outline: none;
-            box-sizing: border-box;
-        }
-
-        /* How to Use Box */
-        .how-to {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 20px;
-            padding: 18px;
-            margin-bottom: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.03);
-        }
-
-        .how-to h3 {
-            font-size: 14px;
-            margin: 0 0 12px 0;
-            color: #fff;
+        .social-btn-content {
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .how-to li {
-            font-size: 13px;
-            color: var(--text-dim);
-            margin-bottom: 8px;
-            list-style: none;
+        .social-btn i.fa-arrow-right {
+            font-size: 0.75rem;
+            color: var(--subtitle-color);
+            opacity: 0.8;
         }
 
-        .how-to li span {
-            color: var(--accent);
-            font-weight: bold;
-            margin-right: 8px;
-        }
-
-        #dlBtn {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(90deg, #007cf0, #00dfd8);
-            color: white;
+        .counter-box {
+            background-color: #161614;
             border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            color: #8c8c8c;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .counter-box span {
+            color: #ccff00;
+            font-weight: bold;
+        }
+
+        .search-container {
+            width: 100%;
+            max-width: 450px;
+            position: relative;
+            margin-bottom: 18px;
+            padding: 0 4px !important;
+            display: block !important;
+        }
+
+        .search-container i {
+            position: absolute !important;
+            left: 18px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            color: var(--subtitle-color) !important;
+            font-size: 0.95rem !important;
+            z-index: 10 !important;
+            margin: 0 !important;
+        }
+
+        .search-bar {
+            width: 100% !important;
+            background-color: var(--search-bg) !important;
+            border: 1px solid var(--search-border) !important;
+            color: var(--text-color) !important;
+            padding: 12px 14px 12px 42px !important;
+            border-radius: 12px !important;
+            outline: none !important;
+            font-size: 0.9rem !important;
+            display: block !important;
+            box-sizing: border-box !important;
+        }
+
+        .gallery-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            width: 100%;
+            max-width: 450px;
+            padding: 0 4px;
+        }
+
+        .card {
+            background-color: transparent;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .image-container {
+            width: 100%;
+            height: 210px;
             border-radius: 16px;
-            font-size: 16px;
-            font-weight: 700;
+            overflow: hidden;
+            background-color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-info {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            padding: 0 2px;
+        }
+
+        .card-actions {
+            display: flex;
+            width: 100%;
+            margin-bottom: 4px;
+        }
+
+        .view-prompt-btn {
+            width: 100%;
+            padding: 8px 4px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            background-color: var(--btn-view-bg);
+            color: var(--btn-view-text);
+            border: 1px solid var(--btn-view-border);
+            transition: all 0.2s ease;
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            margin-top: 24px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 450px;
+            padding: 0 8px;
+        }
+
+        .page-btn {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid var(--card-border);
+            min-width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: bold;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            transition: all 0.15s ease;
         }
 
-        /* Footer Stats */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 30px;
+        .page-btn.active {
+            background-color: var(--btn-copy-bg);
+            color: var(--btn-copy-text);
+            border-color: var(--btn-copy-bg);
+        }
+        
+        .page-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
         }
 
-        .stat-card {
-            background: rgba(255, 255, 255, 0.02);
-            padding: 12px 5px;
-            border-radius: 15px;
-            text-align: center;
-            font-size: 10px;
-            color: var(--text-dim);
-            border: 1px solid rgba(255, 255, 255, 0.03);
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 1000;
         }
 
-        .stat-card i {
-            display: block;
-            font-size: 18px;
-            color: var(--accent);
-            margin-bottom: 6px;
-        }
-
-        /* Telegram Button */
-        .tg-footer {
-            margin-top: 35px;
-            text-align: center;
-        }
-
-        .tg-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            background: var(--tg-color);
-            color: white;
-            padding: 15px 30px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 700;
-            box-shadow: 0 10px 25px rgba(0, 136, 204, 0.4);
-            transition: 0.3s;
-        }
-
-        .tg-btn:hover {
-            transform: translateY(-3px);
-            background: #0099e6;
-        }
-
-        /* --- Tutorial Images Section --- */
-        .tutorial-section {
-            margin-top: 40px;
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-        }
-
-        .tutorial-box {
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 24px;
-            padding: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-        }
-
-        .tutorial-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #ffffff;
-            margin: 0 0 15px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border-left: 4px solid var(--accent);
-            padding-left: 10px;
-        }
-
-        .tutorial-img {
+        .modal-content {
+            background-color: var(--card-bg);
             width: 100%;
-            height: auto;
+            max-width: 450px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 18px;
+            animation: slideUp 0.25s ease-out;
+            border-top: 1px solid var(--card-border);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 12px; right: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            border: none; color: #ffffff; width: 32px; height: 32px;
+            border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 10;
+        }
+
+        .modal-image-wrapper {
+            position: relative;
+            width: 100%;
+            height: 200px;
             border-radius: 14px;
-            display: block;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+            margin-bottom: 12px;
         }
 
-        #results {
-            margin-top: 20px;
-            display: none;
-        }
-
-        .media-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--accent);
-            color: white;
+        .modal-preview-img {
             width: 100%;
-            padding: 14px;
-            margin-top: 10px;
-            border-radius: 12px;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 👑 শেয়ার বাটন এখন বাঁ (Left) পাশে সেট করা হয়েছে */
+        .modal-deep-share-btn {
+            position: absolute;
+            top: 12px;
+            left: 12px; /* ডানে থেকে বাঁয়ে আনা হলো */
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            z-index: 10;
+            transition: background 0.2s;
+        }
+
+        .modal-deep-share-btn:active {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .prompt-box {
+            background-color: var(--modal-prompt-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px; padding: 12px;
+            color: var(--modal-prompt-text); font-size: 0.82rem;
+            max-height: 120px; overflow-y: auto; margin-bottom: 14px;
+            white-space: pre-wrap;
+        }
+
+        .modal-action-group {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .modal-copy-btn {
+            flex: 2;
+            background-color: var(--btn-copy-bg);
+            color: var(--btn-copy-text);
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .modal-telegram-btn {
+            flex: 1;
+            background-color: var(--btn-tg-bg);
+            color: var(--btn-tg-text);
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9rem;
             text-decoration: none;
             display: flex;
-            justify-content: space-between;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
-        .spinner {
-            width: 22px;
-            height: 22px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 0.8s linear infinite;
+        .toast-notif {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #222222;
+            color: #ffffff;
+            padding: 8px 22px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            border: 1px solid #333;
+            z-index: 2000;
             display: none;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
         }
     </style>
 </head>
-
 <body>
 
-    <nav>
-        <a href="#" class="nav-logo">
-            <img src="https://i.postimg.cc/Y90xGXTH/IMG-20260515-162829-055.jpg" alt="fileplaybot logo">
-            <span>𝗙𝗶𝗟𝗘 𝗣𝗟𝗔𝗬 𝗕𝗢𝗧 ❤️‍🩹</span>
-        </a>
-        <div class="menu-icon" id="openMenu"><i class="fas fa-bars"></i></div>
-    </nav>
+    <header>
+        <button class="theme-toggle-btn" id="themeToggle" onclick="toggleTheme()">
+            <i class="fa-solid fa-gear"></i>
+        </button>
 
-    <div class="overlay" id="overlay"></div>
-    <div class="sidebar" id="sidebar">
-        <div class="close-btn" id="closeMenu"><i class="fas fa-times"></i></div>
-        <ul class="sidebar-links">
-            <li><a href="https://t.me/editfactify" target="_blank"><i class="fab fa-telegram"></i> Telegram</a></li>
-        </ul>
-    </div>
-
-    <div class="container">
-        <div class="header">
-            <h1>All Video Downloader</h1>
-            <p style="color: var(--text-dim); font-size: 14px;">Download videos from all social platforms</p>
-        </div>
-
-        <div class="glass-card">
-            <div class="input-wrapper">
-                <i class="fas fa-link"></i>
-                <input type="text" id="urlInput" placeholder="Paste video link here..." autocomplete="off">
-            </div>
-
-            <div class="how-to">
-                <h3><i class="fas fa-info-circle"></i> How to use:</h3>
-                <li><span>1.</span> Open any social media app</li>
-                <li><span>2.</span> Copy the video link</li>
-                <li><span>3.</span> Paste the link above</li>
-                <li><span>4.</span> Click Download and get your video</li>
-            </div>
-
-            <button id="dlBtn">
-                <div class="spinner" id="loader"></div>
-                <i class="fas fa-download" id="btnIcon"></i>
-                <span id="btnText">Download</span>
-            </button>
-
-            <div id="results"></div>
-        </div>
-
-        <div class="stats">
-            <div class="stat-card"><i class="fas fa-shield-check"></i>100% Free</div>
-            <div class="stat-card"><i class="fas fa-mobile-screen"></i>No App Required</div>
-            <div class="stat-card"><i class="fas fa-bolt"></i>Fast & Easy</div>
-        </div>
-
-        <div class="tg-footer">
-            <a href="https://t.me/editfactify" target="_blank" class="tg-btn">
-                <i class="fab fa-telegram-plane"></i> Join Telegram Click here
+        <h1>PROMPTFY</h1>
+        <div class="subtitle">AI Image Generation · Curated by @editfactify</div>
+        
+        <div class="social-links">
+            <a href="https://www.tiktok.com/@editfactify1?_r=1&_t=ZS-96YZkc25pno" target="_blank" class="social-btn">
+                <div class="social-btn-content">
+                    <i class="fa-brands fa-tiktok" style="color: #ff0050;"></i>
+                    <span>TikTok</span>
+                </div>
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
+            <a href="https://t.me/editfactify" target="_blank" class="social-btn">
+                <div class="social-btn-content">
+                    <i class="fa-brands fa-telegram" style="color: #0088cc;"></i>
+                    <span>Telegram</span>
+                </div>
+                <i class="fa-solid fa-arrow-right"></i>
             </a>
         </div>
+    </header>
 
-        <div class="tutorial-section">
-
-            <div class="tutorial-box">
-                <h2 class="tutorial-title"><i class="fas fa-book-open"></i> টিউটোরিয়াল বাংলা</h2>
-                <img src="https://i.postimg.cc/1tYSLxF7/file-00000000aaec71fab7992c03ed5cddbb.png" alt="Bangla Tutorial" class="tutorial-img">
-            </div>
-
-            <div class="tutorial-box">
-                <h2 class="tutorial-title"><i class="fas fa-book-open"></i> Tutorial English</h2>
-                <img src="https://i.postimg.cc/nzwx68mW/file-00000000f0cc71faaedbce3677f4ece1.png" alt="English Tutorial" class="tutorial-img">
-            </div>
-
-            <div class="tutorial-box">
-                <h2 class="tutorial-title"><i class="fas fa-book-open"></i> ट्यूटोरियल हिंद</h2>
-                <img src="https://i.postimg.cc/mgG4xyPn/file-000000004b087207a5022032f1145220.png" alt="Hindi Tutorial" class="tutorial-img">
-            </div>
-
-        </div>
-        <p style="text-align: center; font-size: 11px; color: var(--text-dim); margin-top: 35px; opacity: 0.5;">
-            © 2026 • Premium Experience
-        </p>
+    <div class="counter-box">
+        <i class="fa-solid fa-layer-group"></i> <span id="totalPrompts">0</span> prompt tersedia
     </div>
 
+    <div class="search-container">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" class="search-bar" id="searchInput" placeholder="Search prompt..." oninput="handleSearch()">
+    </div>
+
+    <div class="gallery-container" id="galleryContainer"></div>
+    <div class="pagination-container" id="paginationContainer"></div>
+
+    <div class="modal-overlay" id="promptModal">
+        <div class="modal-content" style="position: relative;">
+            <button class="close-modal" onclick="closePrompt()"><i class="fa-solid fa-xmark"></i></button>
+            
+            <div class="modal-image-wrapper">
+                <img id="modalImg" class="modal-preview-img" src="" alt="">
+                <button class="modal-deep-share-btn" id="shareDeepLinkBtn" onclick="copyDeepLink()" title="Share Deep Link">
+                    <i class="fa-solid fa-share-nodes"></i>
+                </button>
+            </div>
+
+            <div id="modalTitle" style="font-weight: bold; margin-bottom: 8px; font-size: 1rem;">Title</div>
+            <div class="prompt-box" id="modalPromptText">Loading...</div>
+            
+            <div class="modal-action-group">
+                <button class="modal-copy-btn" id="copyBtn" onclick="copyFromModal()">
+                    <i class="fa-regular fa-copy"></i> Copy Prompt
+                </button>
+                <a href="https://t.me/editfactify" target="_blank" class="modal-telegram-btn">
+                    <i class="fa-brands fa-telegram"></i> Telegram
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-notif" id="toastNotif">Disalin</div>
+
     <script>
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
-        const openBtn = document.getElementById('openMenu');
-        const closeBtn = document.getElementById('closeMenu');
-
-        function toggle(isOpen) {
-            sidebar.classList.toggle('active', isOpen);
-            overlay.classList.toggle('active', isOpen);
-        }
-        openBtn.onclick = () => toggle(true);
-        closeBtn.onclick = () => toggle(false);
-        overlay.onclick = () => toggle(false);
-
-        const dlBtn = document.getElementById('dlBtn');
-        const urlInput = document.getElementById('urlInput');
-        const results = document.getElementById('results');
-
-        dlBtn.onclick = async () => {
-            const url = urlInput.value.trim();
-            if (!url) return alert("Please paste a link!");
-
-            document.getElementById('loader').style.display = 'block';
-            document.getElementById('btnIcon').style.display = 'none';
-            dlBtn.disabled = true;
-
-            try {
-                const response = await fetch('https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-rapidapi-host': 'social-download-all-in-one.p.rapidapi.com',
-                        'x-rapidapi-key': 'f751ba2e32mshc5552fddf7efc07p137ddejsnc1cbf3774901'
-                    },
-                    body: JSON.stringify({
-                        url: url
-                    })
-                });
-                const data = await response.json();
-                results.innerHTML = '';
-                results.style.display = 'block';
-                if (data.medias) {
-                    data.medias.forEach(m => {
-                        results.innerHTML += `<a href="${m.url}" target="_blank" class="media-btn"><span>${m.quality}</span><i class="fas fa-download"></i></a>`;
-                    });
-                }
-            } catch (e) {
-                alert("Error!");
-            } finally {
-                document.getElementById('loader').style.display = 'none';
-                document.getElementById('btnIcon').style.display = 'block';
-                dlBtn.disabled = false;
-            }
+        const firebaseConfig = {
+            apiKey: "AIzaSyBx41WBQnxRsjrylnXoxWG2Yc8oHaB_5XM",
+            authDomain: "hhhhjkk9-3063d.firebaseapp.com",
+            databaseURL: "https://hhhhjkk9-3063d-default-rtdb.firebaseio.com",
+            projectId: "hhhhjkk9-3063d",
+            storageBucket: "hhhhjkk9-3063d.firebasestorage.app",
+            messagingSenderId: "69289174757",
+            appId: "1:69289174757:web:01fec92c7e03c3f9e3160c"
         };
-    </script>
-</body>
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
-</html>
+        database.ref('visitors_count').transaction(function(current_value) {
+            return (current_value || 0) + 1;
+        });
+
+        database.ref('settings/ads_enabled').on('value', function(snapshot) {
+            const adsEnabled = snapshot.val() !== false;
+            if (adsEnabled) {
+                if (!document.getElementById('monetagScript')) {
+                    const script = document.createElement('script');
+                    script.id = 'monetagScript
