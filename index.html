@@ -4,11 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
+    <link rel="icon" type="image/jpeg" href="1000030133.jpg">
+    <link rel="apple-touch-icon" href="1000030133.jpg">
+    
     <meta name="google-site-verification" content="tkhffQ2yi6C8WbWOwSzlQI2rrL5KHR58J4AZcwnkxM8" />
     
-    <meta name="monetag" content="d93387477b25bd71cdbf3a4f7002b778">
+    <meta name="description" content="Promptfy - High-quality AI Image Generation Prompts. Copy curated prompts for Bing Image Creator, Midjourney, Leonardo AI, and Gaming Logos.">
+    <meta name="keywords" content="Promptfy, AI prompts, Bing Image Creator prompts, Midjourney prompts, Gaming logo prompts, Free Fire logo designer, Editfactify, image generation text, custom photo editing">
+    <meta name="author" content="@editfactify">
+    <meta name="robots" content="index, follow">
     
-    <title>promtfy</title>
+    <meta property="og:title" content="Promptfy - AI Image Generation Prompts Hub">
+    <meta property="og:description" content="Copy curated high-quality AI image generation text prompts.">
+    <meta property="og:image" content="1000030133.jpg">
+    <meta property="og:type" content="website">
+    
+    <title>Promptfy - AI Image Generation Prompts Hub</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css?v=2.0">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -76,6 +87,8 @@
             align-items: center;
             transition: background-color 0.3s ease;
             overflow-x: hidden;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
         }
 
         header {
@@ -146,7 +159,6 @@
 
         .social-btn:active {
             transform: scale(0.97);
-            background-color: rgba(255, 255, 255, 0.05);
         }
 
         .social-btn-content {
@@ -219,6 +231,7 @@
             width: 100%;
             max-width: 450px;
             padding: 0 4px;
+            contain: content;
         }
 
         .card {
@@ -235,6 +248,7 @@
             overflow: hidden;
             background-color: #1a1a1a;
             margin-bottom: 8px;
+            transform: translateZ(0);
         }
 
         .image-container img {
@@ -282,7 +296,11 @@
             background-color: var(--btn-view-bg);
             color: var(--btn-view-text);
             border: 1px solid var(--btn-view-border);
-            transition: all 0.2s ease;
+            transition: background-color 0.15s ease, transform 0.1s ease;
+        }
+        
+        .view-prompt-btn:active {
+            transform: scale(0.98);
         }
 
         .pagination-container {
@@ -332,6 +350,7 @@
             justify-content: center;
             align-items: flex-end;
             z-index: 1000;
+            contain: strict;
         }
 
         .modal-content {
@@ -341,7 +360,7 @@
             border-top-left-radius: 20px;
             border-top-right-radius: 20px;
             padding: 18px;
-            animation: slideUp 0.25s ease-out;
+            animation: slideUp 0.22s cubic-bezier(0.25, 1, 0.5, 1) forwards;
             border-top: 1px solid var(--card-border);
         }
 
@@ -375,11 +394,10 @@
             object-fit: cover;
         }
 
-        /* 👑 শেয়ার বাটন এখন বাঁ (Left) পাশে সেট করা হয়েছে */
         .modal-deep-share-btn {
             position: absolute;
             top: 12px;
-            left: 12px; /* ডানে থেকে বাঁয়ে আনা হলো */
+            left: 12px; 
             background: rgba(0, 0, 0, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: #ffffff;
@@ -392,11 +410,6 @@
             justify-content: center;
             font-size: 0.95rem;
             z-index: 10;
-            transition: background 0.2s;
-        }
-
-        .modal-deep-share-btn:active {
-            background: rgba(0, 0, 0, 0.8);
         }
 
         .prompt-box {
@@ -498,10 +511,10 @@
 
     <div class="search-container">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" class="search-bar" id="searchInput" placeholder="Search prompt..." oninput="handleSearch()">
+        <input type="text" class="search-bar" id="searchInput" placeholder="Search prompt..." oninput="debounceSearch()">
     </div>
 
-    <div class="gallery-container" id="galleryContainer"></div>
+    <main class="gallery-container" id="galleryContainer"></main>
     <div class="pagination-container" id="paginationContainer"></div>
 
     <div class="modal-overlay" id="promptModal">
@@ -509,7 +522,7 @@
             <button class="close-modal" onclick="closePrompt()"><i class="fa-solid fa-xmark"></i></button>
             
             <div class="modal-image-wrapper">
-                <img id="modalImg" class="modal-preview-img" src="" alt="">
+                <img id="modalImg" class="modal-preview-img" src="" alt="AI Preview">
                 <button class="modal-deep-share-btn" id="shareDeepLinkBtn" onclick="copyDeepLink()" title="Share Deep Link">
                     <i class="fa-solid fa-share-nodes"></i>
                 </button>
@@ -544,25 +557,6 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        database.ref('visitors_count').transaction(function(current_value) {
-            return (current_value || 0) + 1;
-        });
-
-        database.ref('settings/ads_enabled').on('value', function(snapshot) {
-            const adsEnabled = snapshot.val() !== false;
-            if (adsEnabled) {
-                if (!document.getElementById('monetagScript')) {
-                    const script = document.createElement('script');
-                    script.id = 'monetagScript';
-                    script.text = `(function(s){s.dataset.zone='11042175',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).filter(Boolean).pop().appendChild(document.createElement('script')))`;
-                    document.head.appendChild(script);
-                }
-            } else {
-                const existingScript = document.getElementById('monetagScript');
-                if (existingScript) existingScript.remove();
-            }
-        });
-
         let allPromptsList = [];
         let filteredList = [];
         let currentPage = 1;
@@ -570,15 +564,11 @@
         let isSearching = false;
         let activePromptText = "";
         let activePromptId = "";
+        let searchTimeout;
 
-        function toggleTheme() {
-            const html = document.documentElement;
-            if (html.getAttribute('data-theme') === 'dark') {
-                html.setAttribute('data-theme', 'light');
-            } else {
-                html.setAttribute('data-theme', 'dark');
-            }
-        }
+        database.ref('visitors_count').transaction(function(current_value) {
+            return (current_value || 0) + 1;
+        });
 
         database.ref('prompts').once('value').then(function(snapshot) {
             allPromptsList = [];
@@ -594,7 +584,6 @@
             filteredList = [...allPromptsList];
             displayCards();
             setupPagination();
-
             checkDeepLink();
             
         }).catch(function(error) {
@@ -609,12 +598,14 @@
             let end = start + itemsPerPage;
             let itemsToDisplay = isSearching ? filteredList : filteredList.slice(start, end);
 
+            const fragment = document.createDocumentFragment();
+
             itemsToDisplay.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
                     <div class="image-container">
-                        <img src="${item.image}" alt="">
+                        <img src="${item.image}" alt="Prompt Thumbnail" loading="lazy" decoding="async">
                     </div>
                     <div class="card-info">
                         <div class="card-title">${item.title}</div>
@@ -625,8 +616,9 @@
                         </div>
                     </div>
                 `;
-                container.appendChild(card);
+                fragment.appendChild(card);
             });
+            container.appendChild(fragment);
         }
 
         function setupPagination() {
@@ -636,6 +628,8 @@
 
             const totalPages = Math.ceil(filteredList.length / itemsPerPage);
             if(totalPages <= 1) return;
+
+            const fragment = document.createDocumentFragment();
 
             const prevBtn = document.createElement('button');
             prevBtn.className = 'page-btn';
@@ -648,7 +642,7 @@
                     setupPagination();
                 }
             };
-            pgContainer.appendChild(prevBtn);
+            fragment.appendChild(prevBtn);
 
             let maxVisibleButtons = 5; 
             let startPage = Math.max(1, currentPage - Math.floor(maxVisibleButtons / 2));
@@ -667,9 +661,9 @@
                     currentPage = i;
                     displayCards();
                     setupPagination();
-                    window.scrollTo({top: 0, behavior: 'smooth'});
+                    window.scrollTo({top: 0, behavior: 'auto'});
                 };
-                pgContainer.appendChild(btn);
+                fragment.appendChild(btn);
             }
 
             const nextBtn = document.createElement('button');
@@ -683,7 +677,13 @@
                     setupPagination();
                 }
             };
-            pgContainer.appendChild(nextBtn);
+            fragment.appendChild(nextBtn);
+            pgContainer.appendChild(fragment);
+        }
+
+        function debounceSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(handleSearch, 250);
         }
 
         function handleSearch() {
@@ -757,13 +757,22 @@
                 toast.style.display = 'block';
                 setTimeout(() => { toast.style.display = 'none'; }, 1500);
             } catch (err) {
-                alert('কপি করা যায়নি!');
+                console.error("Copy operation failed", err);
             }
             document.body.removeChild(textarea);
         }
 
         window.onclick = function(e) {
             if (e.target == document.getElementById('promptModal')) { closePrompt(); }
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.setAttribute('data-theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+            }
         }
 
         window.addEventListener('hashchange', checkDeepLink);
